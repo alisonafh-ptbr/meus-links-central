@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Links Úteis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="app-version" content="1.3.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Links Úteis">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 1rem;
+      background: #f5f5f5;
+      color: #333;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0078d7;
+      color: white;
+      padding: 1rem;
+      position: relative;
+    }
+    header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    .menu-container {
+      position: relative;
+    }
+    .menu-btn {
+      background: white;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: #0078d7;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .menu-btn:hover {
+      background: #ffdd57;
+      color: #005fa3;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 50px;
+      background: white;
+      color: #333;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 180px;
+      z-index: 1000;
+      overflow: hidden;
+    }
+    .dropdown-menu button {
+      width: 100%;
+      padding: 12px 16px;
+      text-align: left;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #333;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .dropdown-menu button:last-child {
+      border-bottom: none;
+    }
+    .dropdown-menu button:hover {
+      background: #f5f5f5;
+      color: #0078d7;
+    }
+    .container {
+      padding: 1rem;
+      padding-bottom: 100px;
+    }
+    .modal {
+      display: none;
+      margin-top: 1rem;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .modal h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    input, select {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button[type="submit"] {
+      padding: 12px;
+      background: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button[type="submit"]:hover {
+      background: #005fa3;
+    }
+    .category-section {
+      margin-bottom: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .category-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 1rem;
+      background: #eef2f7;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    .category-title:hover {
+      background: #e2e8f0;
+    }
+    .category-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .category-content {
+      display: none;
+      padding: 1rem;
+    }
+    .category-section.open .category-content {
+      display: block;
+    }
+    .grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      min-height: 40px;
+    }
+    .link-item-wrapper {
+      position: relative;
+      background: #0078d7;
+      border-radius: 8px;
+      transition: transform 0.2s, opacity 0.2s;
+      cursor: grab;
+    }
+    .link-item-wrapper:active {
+      cursor: grabbing;
+    }
+    .link-item-wrapper.dragging {
+      opacity: 0.4;
+    }
+    .link-item-wrapper.drag-over {
+      border: 2px dashed #ffdd57;
+      transform: scale(1.03);
+    }
+    .link-item {
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.1rem;
+      word-break: break-word;
+      user-select: none;
+    }
+    .link-item-actions {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .link-item-wrapper:hover .link-item-actions {
+      opacity: 1;
+    }
+    .link-action-btn {
+      background: rgba(0,0,0,0.4);
+      border: none;
+      color: white;
+      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .link-action-btn:hover {
+      background: rgba(0,0,0,0.8);
+    }
+    .import-list {
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .import-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .import-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      cursor: pointer;
+    }
+    .import-item label {
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    #trash {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #e74c3c;
+      color: white;
+      font-size: 1.5rem;
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.2s;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    #trash.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #trash.dragover {
+      background: #c0392b;
+      transform: translateX(-50%) scale(1.15);
+    }
+    .version-footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 2rem;
+    }
+    @media (max-width: 600px) {
+      header h2 {
+        font-size: 1rem;
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #121212;
+        color: #e0e0e0;
+      }
+      header {
+        background: #1f1f1f;
+        color: #e0e0e0;
+      }
+      .menu-btn {
+        background: #333;
+        color: #e0e0e0;
+      }
+      .menu-btn:hover {
+        background: #555;
+        color: #ffdd57;
+      }
+      .dropdown-menu {
+        background: #1f1f1f;
+        color: #e0e0e0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      }
+      .dropdown-menu button {
+        color: #e0e0e0;
+        border-bottom: 1px solid #333;
+      }
+      .dropdown-menu button:hover {
+        background: #2a2a2a;
+        color: #ffdd57;
+      }
+      .modal, .category-section {
+        background: #1f1f1f;
+        color: #e0e0e0;
+      }
+      .category-title {
+        background: #2a2a2a;
+        color: #e0e0e0;
+      }
+      .category-title:hover {
+        background: #333;
+      }
+      .link-item-wrapper {
+        background: #333;
+      }
+      .link-item-wrapper.drag-over {
+        border: 2px dashed #ffdd57;
+      }
+      input, select {
+        background: #1f1f1f;
+        color: #e0e0e0;
+        border: 1px solid #555;
+      }
+      button[type="submit"] {
+        background: #333;
+        color: #e0e0e0;
+      }
+      button[type="submit"]:hover {
+        background: #555;
+      }
+      .import-list {
+        border-color: #555;
+        background: #121212;
+      }
+      #trash {
+        background: #b71c1c;
+      }
+      #trash.dragover {
+        background: #8e0000;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Meus Links Úteis</h2>
+    <div class="menu-container">
+      <button class="menu-btn" id="menuToggle" title="Menu">⋮</button>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <button id="menuAddLink">🔗 Incluir Link</button>
+        <button id="menuAddCategory">📁 Incluir Categoria</button>
+        <button id="menuExport">💾 Exportar</button>
+        <button id="menuImport">📂 Importar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="modal" id="categoryModal">
+      <h3 id="categoryModalTitle">Adicionar Nova Categoria</h3>
+      <form id="categoryForm">
+        <input type="text" id="categoryName" placeholder="Nome da categoria" required>
+        <div id="importSection" style="display: none;">
+          <p style="margin: 0 0 5px 0; font-size: 0.9rem;">Deseja importar links sem categoria para esta nova pasta?</p>
+          <div class="import-list" id="importList"></div>
+        </div>
+        <button type="submit">Salvar Categoria</button>
+      </form>
+    </div>
+
+    <div class="modal" id="formContainer">
+      <h3 id="linkModalTitle">Adicionar Novo Link</h3>
+      <form id="linkForm">
+        <input type="text" id="linkName" placeholder="Nome do link" required>
+        <input type="url" id="linkUrl" placeholder="URL do link" required>
+        <div id="categorySelectWrapper" style="display: none;">
+          <select id="linkCategory">
+            <option value="">Sem Categoria</option>
+          </select>
+        </div>
+        <button type="submit">Adicionar Link</button>
+      </form>
+    </div>
+
+    <div class="modal" id="deleteCategoryModal">
+      <h3 id="deleteCategoryTitle">Excluir Categoria</h3>
+      <p id="deleteCategoryMsg" style="font-size: 0.95rem; margin-bottom: 10px;"></p>
+      <div id="reassignContainer" style="display: none; margin-bottom: 12px;">
+        <p style="font-size: 0.85rem; margin: 0 0 5px 0;">Selecione os links que deseja mover para outra categoria:</p>
+        <div class="import-list" id="reassignList"></div>
+        <select id="targetCategorySelect" style="margin-top: 8px;"></select>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" id="delCatYes" style="flex: 1; background: #e74c3c;">Sim</button>
+        <button type="button" id="delCatNo" style="flex: 1; background: #6c757d;">Não</button>
+      </div>
+    </div>
+
+    <div id="appContainer"></div>
+    <div class="version-footer" id="versionDisplay">Versão: 1.3.0</div>
+  </div>
+
+  <input type="file" id="importFile" accept="*/*" style="display: none;">
+  <div id="trash">🗑️</div>
+
+  <script>
+    let links = JSON.parse(localStorage.getItem("meusLinks")) || [];
+    let categories = JSON.parse(localStorage.getItem("minhasCategorias")) || [];
+
+    let editingLinkIndex = null;
+    let editingCategoryName = null;
+
+    const appContainer = document.getElementById("appContainer");
+    const linkForm = document.getElementById("linkForm");
+    const categoryForm = document.getElementById("categoryForm");
+    const formContainer = document.getElementById("formContainer");
+    const categoryModal = document.getElementById("categoryModal");
+    const deleteCategoryModal = document.getElementById("deleteCategoryModal");
+    
+    const menuToggle = document.getElementById("menuToggle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    const menuAddLink = document.getElementById("menuAddLink");
+    const menuAddCategory = document.getElementById("menuAddCategory");
+    const menuExport = document.getElementById("menuExport");
+    const menuImport = document.getElementById("menuImport");
+
+    const trash = document.getElementById("trash");
+    const linkNameInput = document.getElementById("linkName");
+    const linkUrlInput = document.getElementById("linkUrl");
+    const categoryNameInput = document.getElementById("categoryName");
+    let linkCategorySelect = document.getElementById("linkCategory");
+    const categorySelectWrapper = document.getElementById("categorySelectWrapper");
+    const importSection = document.getElementById("importSection");
+    const importList = document.getElementById("importList");
+    const importFile = document.getElementById("importFile");
+
+    function salvarDados() {
+      localStorage.setItem("meusLinks", JSON.stringify(links));
+      localStorage.setItem("minhasCategorias", JSON.stringify(categories));
+    }
+
+    menuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+    });
+
+    window.addEventListener("click", () => {
+      dropdownMenu.style.display = "none";
+    });
+
+    function fecharModais() {
+      formContainer.style.display = "none";
+      categoryModal.style.display = "none";
+      deleteCategoryModal.style.display = "none";
+      dropdownMenu.style.display = "none";
+    }
+
+    menuAddLink.addEventListener("click", () => {
+      fecharModais();
+      editingLinkIndex = null;
+      document.getElementById("linkModalTitle").textContent = "Adicionar Novo Link";
+      linkForm.reset();
+      formContainer.style.display = "block";
+      atualizarSelectCategorias();
+      linkNameInput.focus();
+    });
+
+    menuAddCategory.addEventListener("click", () => {
+      fecharModais();
+      editingCategoryName = null;
+      document.getElementById("categoryModalTitle").textContent = "Adicionar Nova Categoria";
+      categoryForm.reset();
+      categoryModal.style.display = "block";
+      categoryNameInput.focus();
+      
+      const semCategoria = links.filter(l => !l.category || !categories.includes(l.category));
+      if (semCategoria.length > 0) {
+        importSection.style.display = "block";
+        importList.innerHTML = "";
+        semCategoria.forEach((l, idx) => {
+          const div = document.createElement("div");
+          div.className = "import-item";
+          div.innerHTML = `<input type="checkbox" value="${links.indexOf(l)}" id="imp_${idx}"> <label for="imp_${idx}">${l.name}</label>`;
+          importList.appendChild(div);
+        });
+      } else {
+        importSection.style.display = "none";
+      }
+    });
+
+    menuExport.addEventListener("click", () => {
+      fecharModais();
+      const dados = {
+        links: links,
+        categories: categories
+      };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "meus_links_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    });
+
+    menuImport.addEventListener("click", () => {
+      fecharModais();
+      importFile.value = "";
+      importFile.click();
+    });
+
+    function atualizarSelectCategorias() {
+      if (categories.length === 0) {
+        categorySelectWrapper.style.display = "none";
+        linkCategorySelect.value = "";
+      } else {
+        categorySelectWrapper.style.display = "block";
+        linkCategorySelect.innerHTML = '<option value="">Sem Categoria</option>';
+        categories.forEach(cat => {
+          const option = document.createElement("option");
+          option.value = cat;
+          option.textContent = cat;
+          linkCategorySelect.appendChild(option);
+        });
+      }
+    }
+
+    function renderizarApp() {
+      appContainer.innerHTML = "";
+      atualizarSelectCategorias();
+
+      const agrupamento = { "": [] };
+      categories.forEach(cat => agrupamento[cat] = []);
+
+      links.forEach((link, index) => {
+        const cat = link.category && categories.includes(link.category) ? link.category : "";
+        if (!agrupamento[cat]) agrupamento[cat] = [];
+        agrupamento[cat].push({ ...link, originalIndex: index });
+      });
+
+      if (categories.length === 0) {
+        if (agrupamento[""].length > 0) {
+          const grid = document.createElement("div");
+          grid.className = "grid";
+          grid.dataset.category = "";
+          agrupamento[""].forEach(link => {
+            const wrapper = criarElementoLink(link);
+            grid.appendChild(wrapper);
+          });
+          configurarDropGrid(grid);
+          appContainer.appendChild(grid);
+        }
+      } else {
+        categories.forEach((cat, index) => {
+          criarSecaoPasta(cat, agrupamento[cat], index === 0);
+        });
+
+        if (agrupamento[""].length > 0) {
+          criarSecaoPasta("Geral / Sem Categoria", agrupamento[""], false, true);
+        }
+      }
+
+      salvarDados();
+    }
+
+    function criarElementoLink(link) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "link-item-wrapper";
+      wrapper.draggable = true;
+      wrapper.dataset.index = link.originalIndex;
+
+      const item = document.createElement("div");
+      item.className = "link-item";
+      item.textContent = link.name;
+
+      // Clique para abrir o link somente se não for um arrasto
+      let clicked = true;
+      wrapper.addEventListener("pointerdown", () => { clicked = true; });
+      wrapper.addEventListener("pointermove", () => { clicked = false; });
+      wrapper.addEventListener("click", (e) => {
+        if (clicked && !e.target.closest(".link-item-actions")) {
+          window.open(link.url, "_blank");
+        }
+      });
+
+      // Eventos nativos de Drag and Drop para reordenação e exclusão
+      wrapper.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", link.originalIndex);
+        setTimeout(() => wrapper.classList.add("dragging"), 0);
+        trash.classList.add("visible");
+      });
+      
+      wrapper.addEventListener("dragend", () => {
+        wrapper.classList.remove("dragging");
+        trash.classList.remove("visible");
+        trash.classList.remove("dragover");
+        document.querySelectorAll(".link-item-wrapper").forEach(el => el.classList.remove("drag-over"));
+      });
+
+      wrapper.addEventListener("dragover", e => {
+        e.preventDefault();
+        wrapper.classList.add("drag-over");
+      });
+
+      wrapper.addEventListener("dragleave", () => {
+        wrapper.classList.remove("drag-over");
+      });
+
+      wrapper.addEventListener("drop", e => {
+        e.preventDefault();
+        wrapper.classList.remove("drag-over");
+        const origemIdx = parseInt(e.dataTransfer.getData("text/plain"));
+        const destinoIdx = parseInt(wrapper.dataset.index);
+
+        if (!isNaN(origemIdx) && !isNaN(destinoIdx) && origemIdx !== destinoIdx) {
+          reordenarLinks(origemIdx, destinoIdx);
+        }
+      });
+
+      const actionsDiv = document.createElement("div");
+      actionsDiv.className = "link-item-actions";
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "link-action-btn";
+      editBtn.textContent = "✏️";
+      editBtn.title = "Editar Link";
+      editBtn.onclick = (e) => {
+        e.stopPropagation();
+        abrirEdicaoLink(link.originalIndex);
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "link-action-btn";
+      deleteBtn.textContent = "🗑️";
+      deleteBtn.title = "Excluir Link";
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm(`Deseja excluir o link "${link.name}"?`)) {
+          links.splice(link.originalIndex, 1);
+          renderizarApp();
+        }
+      };
+
+      actionsDiv.appendChild(editBtn);
+      actionsDiv.appendChild(deleteBtn);
+
+      wrapper.appendChild(item);
+      wrapper.appendChild(actionsDiv);
+
+      return wrapper;
+    }
+
+    function configurarDropGrid(grid) {
+      grid.addEventListener("dragover", e => e.preventDefault());
+      grid.addEventListener("drop", e => {
+        e.preventDefault();
+        const origemIdx = parseInt(e.dataTransfer.getData("text/plain"));
+        const targetCat = grid.dataset.category || "";
+        if (!isNaN(origemIdx) && links[origemIdx]) {
+          links[origemIdx].category = targetCat;
+          renderizarApp();
+        }
+      });
+    }
+
+    function reordenarLinks(origemIdx, destinoIdx) {
+      const itemMovido = links.splice(origemIdx, 1)[0];
+      
+      // Ajusta o índice de destino caso o item removido estivesse antes
+      if (origemIdx < destinoIdx) {
+        destinoIdx--;
+      }
+      
+      links.splice(destinoIdx, 0, itemMovido);
+      renderizarApp();
+    }
+
+    function abrirEdicaoLink(index) {
+      editingLinkIndex = index;
+      const link = links[index];
+      document.getElementById("linkModalTitle").textContent = "Editar Link";
+      linkNameInput.value = link.name;
+      linkUrlInput.value = link.url;
+      atualizarSelectCategorias();
+      linkCategorySelect.value = link.category || "";
+      
+      fecharModais();
+      formContainer.style.display = "block";
+      linkNameInput.focus();
+    }
+
+    function criarSecaoPasta(nomeCat, itens, iniciarAberta = false, isGeral = false) {
+      const section = document.createElement("div");
+      section.className = "category-section";
+      if (iniciarAberta) section.classList.add("open");
+
+      const title = document.createElement("div");
+      title.className = "category-title";
+      
+      const spanName = document.createElement("span");
+      spanName.textContent = `📁 ${nomeCat} (${itens.length})`;
+      title.appendChild(spanName);
+      
+      const actionsDiv = document.createElement("div");
+      actionsDiv.className = "category-actions";
+
+      if (!isGeral) {
+        const editCatBtn = document.createElement("button");
+        editCatBtn.textContent = "✏️ Editar";
+        editCatBtn.style.cssText = "background:none; border:none; color:#0078d7; cursor:pointer; font-size:0.8rem;";
+        editCatBtn.onclick = (e) => {
+          e.stopPropagation();
+          abrirEdicaoCategoria(nomeCat);
+        };
+        actionsDiv.appendChild(editCatBtn);
+
+        const deleteCatBtn = document.createElement("button");
+        deleteCatBtn.textContent = "❌ Excluir";
+        deleteCatBtn.style.cssText = "background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.8rem;";
+        deleteCatBtn.onclick = (e) => {
+          e.stopPropagation();
+          iniciarExclusaoCategoria(nomeCat, itens);
+        };
+        actionsDiv.appendChild(deleteCatBtn);
+      }
+      title.appendChild(actionsDiv);
+
+      const content = document.createElement("div");
+      content.className = "category-content";
+
+      const grid = document.createElement("div");
+      grid.className = "grid";
+      grid.dataset.category = isGeral ? "" : nomeCat;
+
+      itens.forEach(link => {
+        const wrapper = criarElementoLink(link);
+        grid.appendChild(wrapper);
+      });
+
+      configurarDropGrid(grid);
+      content.appendChild(grid);
+      section.appendChild(title);
+      section.appendChild(content);
+
+      title.addEventListener("click", () => {
+        const jaAberta = section.classList.contains("open");
+        document.querySelectorAll(".category-section").forEach(s => s.classList.remove("open"));
+        if (!jaAberta) {
+          section.classList.add("open");
+        }
+      });
+
+      appContainer.appendChild(section);
+    }
+
+    function abrirEdicaoCategoria(nomeCat) {
+      editingCategoryName = nomeCat;
+      document.getElementById("categoryModalTitle").textContent = "Editar Categoria";
+      categoryNameInput.value = nomeCat;
+      importSection.style.display = "none";
+      
+      fecharModais();
+      categoryModal.style.display = "block";
+      categoryNameInput.focus();
+    }
+
+    function iniciarExclusaoCategoria(nomeCat, itens) {
+      fecharModais();
+      deleteCategoryModal.style.display = "block";
+
+      document.getElementById("deleteCategoryTitle").textContent = `Excluir Categoria: ${nomeCat}`;
+      const msg = document.getElementById("deleteCategoryMsg");
+      const reassignContainer = document.getElementById("reassignContainer");
+      const reassignList = document.getElementById("reassignList");
+      const targetSelect = document.getElementById("targetCategorySelect");
+      const btnYes = document.getElementById("delCatYes");
+      const btnNo = document.getElementById("delCatNo");
+
+      if (itens.length === 0) {
+        msg.textContent = `Deseja excluir a categoria "${nomeCat}"? Ela está vazia.`;
+        reassignContainer.style.display = "none";
+      } else {
+        msg.textContent = `Deseja excluir todos os links abaixo pertencentes a "${nomeCat}"?`;
+        reassignContainer.style.display = "block";
+
+        reassignList.innerHTML = "";
+        itens.forEach((link, idx) => {
+          const div = document.createElement("div");
+          div.className = "import-item";
+          div.innerHTML = `<input type="checkbox" value="${link.originalIndex}" id="re_item_${idx}" checked> <label for="re_item_${idx}">${link.name}</label>`;
+          reassignList.appendChild(div);
+        });
+
+        targetSelect.innerHTML = '<option value="">-- Mover para Sem Categoria (Página Principal) --</option>';
+        categories.filter(c => c !== nomeCat).forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = `Pasta: ${c}`;
+          targetSelect.appendChild(opt);
+        });
+      }
+
+      const newBtnYes = btnYes.cloneNode(true);
+      const newBtnNo = btnNo.cloneNode(true);
+      btnYes.parentNode.replaceChild(newBtnYes, btnYes);
+      btnNo.parentNode.replaceChild(newBtnNo, btnNo);
+
+      newBtnYes.addEventListener("click", () => {
+        links = links.filter(l => l.category !== nomeCat);
+        categories = categories.filter(c => c !== nomeCat);
+        deleteCategoryModal.style.display = "none";
+        renderizarApp();
+      });
+
+      newBtnNo.addEventListener("click", () => {
+        if (itens.length > 0) {
+          const checkboxes = reassignList.querySelectorAll("input[type='checkbox']:checked");
+          const destino = targetSelect.value;
+          checkboxes.forEach(chk => {
+            const originalIdx = parseInt(chk.value);
+            if (links[originalIdx]) {
+              links[originalIdx].category = destino;
+            }
+          });
+        }
+        categories = categories.filter(c => c !== nomeCat);
+        deleteCategoryModal.style.display = "none";
+        renderizarApp();
+      });
+    }
+
+    linkForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const nome = linkNameInput.value.trim();
+      const url = linkUrlInput.value.trim();
+      const cat = categories.length > 0 ? linkCategorySelect.value : "";
+
+      if (editingLinkIndex !== null) {
+        links[editingLinkIndex] = { name: nome, url: url, category: cat };
+        editingLinkIndex = null;
+      } else {
+        links.push({ name: nome, url: url, category: cat });
+      }
+
+      renderizarApp();
+      linkForm.reset();
+      formContainer.style.display = "none";
+    });
+
+    categoryForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const novaCat = categoryNameInput.value.trim();
+
+      if (!novaCat) return;
+
+      if (editingCategoryName !== null) {
+        if (novaCat !== editingCategoryName && categories.includes(novaCat)) {
+          alert("Esta categoria já existe.");
+          return;
+        }
+        const index = categories.indexOf(editingCategoryName);
+        if (index !== -1) {
+          categories[index] = novaCat;
+          links.forEach(l => {
+            if (l.category === editingCategoryName) {
+              l.category = novaCat;
+            }
+          });
+        }
+        editingCategoryName = null;
+      } else {
+        if (categories.includes(novaCat)) {
+          alert("Esta categoria já existe.");
+          return;
+        }
+        categories.push(novaCat);
+
+        const checkboxes = importList.querySelectorAll("input[type='checkbox']:checked");
+        checkboxes.forEach(chk => {
+          const indexOriginal = parseInt(chk.value);
+          if (links[indexOriginal]) {
+            links[indexOriginal].category = novaCat;
+          }
+        });
+      }
+
+      renderizarApp();
+      categoryForm.reset();
+      categoryModal.style.display = "none";
+    });
+
+    importFile.addEventListener("change", (e) => {
+      const arquivo = e.target.files[0];
+      if (!arquivo) return;
+
+      const leitor = new FileReader();
+      leitor.onload = function(event) {
+        try {
+          const dadosImportados = JSON.parse(event.target.result);
+          if (dadosImportados && Array.isArray(dadosImportados.links) && Array.isArray(dadosImportados.categories)) {
+            if (confirm("Deseja substituir seus dados atuais pelos dados importados?")) {
+              links = dadosImportados.links;
+              categories = dadosImportados.categories;
+              renderizarApp();
+              alert("Dados importados com sucesso!");
+            }
+          } else {
+            alert("O arquivo selecionado não possui um formato válido.");
+          }
+        } catch (err) {
+          alert("Erro ao ler o arquivo JSON.");
+        }
+        importFile.value = "";
+      };
+      leitor.readAsText(arquivo);
+    });
+
+    trash.addEventListener("dragover", e => {
+      e.preventDefault();
+      trash.classList.add("dragover");
+    });
+
+    trash.addEventListener("dragleave", () => {
+      trash.classList.remove("dragover");
+    });
+
+    trash.addEventListener("drop", e => {
+      e.preventDefault();
+      const origem = e.dataTransfer.getData("text/plain");
+      if (origem !== "") {
+        links.splice(parseInt(origem), 1);
+        renderizarApp();
+      }
+      trash.classList.remove("dragover");
+      trash.classList.remove("visible");
+    });
+
+    renderizarApp();
+  </script>
+</body>
+</html>
