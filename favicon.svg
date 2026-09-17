@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Fundo arredondado combinando com o design -->
+  <rect width="64" height="64" rx="16" fill="#0078d7"/>
+  
+  <!-- Ícone estilizado de Links/Conexão -->
+  <path d="M26 22h-4a8 8 0 0 0 0 16h4M38 42h4a8 8 0 0 0 0-16h-4" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="24" y1="32" x2="40" y2="32" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+</svg>
