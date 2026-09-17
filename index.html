@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Central de Links</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="app-version" content="1.4.0">
+  <meta name="app-version" content="1.4.2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Central de Links">
@@ -27,6 +27,7 @@
       color: white;
       padding: 1rem;
       position: relative;
+      z-index: 1000;
     }
     header h2 {
       margin: 0;
@@ -34,6 +35,7 @@
     }
     .menu-container {
       position: relative;
+      z-index: 1001;
     }
     .menu-btn {
       background: white;
@@ -61,9 +63,9 @@
       background: white;
       color: #333;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       width: 180px;
-      z-index: 1000;
+      z-index: 9999;
       overflow: hidden;
     }
     .dropdown-menu button {
@@ -87,6 +89,8 @@
     .container {
       padding: 1rem;
       padding-bottom: 100px;
+      position: relative;
+      z-index: 1;
     }
     .modal {
       display: none;
@@ -130,7 +134,7 @@
       background: #fff;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      overflow: hidden;
+      overflow: visible;
     }
     .category-title {
       font-size: 1.1rem;
@@ -142,6 +146,8 @@
       justify-content: space-between;
       align-items: center;
       user-select: none;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
     }
     .category-title:hover {
       background: #e2e8f0;
@@ -154,6 +160,7 @@
     }
     .category-actions-container {
       position: relative;
+      z-index: 10;
     }
     .cat-menu-btn {
       background: transparent;
@@ -176,9 +183,9 @@
       background: white;
       color: #333;
       border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       width: 130px;
-      z-index: 100;
+      z-index: 9999;
       overflow: hidden;
     }
     .cat-dropdown button {
@@ -218,6 +225,7 @@
       border-radius: 8px;
       transition: transform 0.2s, opacity 0.2s;
       cursor: pointer;
+      z-index: 1;
     }
     .link-item-wrapper.dragging {
       opacity: 0.4;
@@ -238,6 +246,7 @@
       position: absolute;
       top: 4px;
       right: 4px;
+      z-index: 10;
     }
     .link-menu-btn {
       background: rgba(0,0,0,0.3);
@@ -263,9 +272,9 @@
       background: white;
       color: #333;
       border-radius: 6px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       width: 110px;
-      z-index: 100;
+      z-index: 9999;
       overflow: hidden;
     }
     .link-dropdown button {
@@ -329,7 +338,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s, transform 0.2s;
-      z-index: 1000;
+      z-index: 10000;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     #trash.visible {
@@ -480,13 +489,13 @@
         <select id="targetCategorySelect" style="margin-top: 8px;"></select>
       </div>
       <div style="display: flex; gap: 10px;">
-        <button type="button" id="delCatYes" style="flex: 1; background: #e74c3c;">Sim</button>
-        <button type="button" id="delCatNo" style="flex: 1; background: #6c757d;">Não</button>
+        <button type="button" id="delCatYes" style="flex: 1; background: #e74c3c;">Excluir tudo</button>
+        <button type="button" id="delCatNo" style="flex: 1; background: #0078d7;">Mover</button>
       </div>
     </div>
 
     <div id="appContainer"></div>
-    <div class="version-footer" id="versionDisplay">Versão: 1.4.0</div>
+    <div class="version-footer" id="versionDisplay">Versão: 1.4.2</div>
   </div>
 
   <input type="file" id="importFile" accept="*/*" style="display: none;">
@@ -644,7 +653,6 @@
           appContainer.appendChild(grid);
         }
       } else {
-        // Nenhuma categoria aberta por padrão
         categories.forEach((cat) => {
           criarSecaoPasta(cat, agrupamento[cat], false);
         });
@@ -667,14 +675,12 @@
       item.className = "link-item";
       item.textContent = link.name;
 
-      // Clique simples abre o link diretamente
       wrapper.addEventListener("click", (e) => {
         if (!e.target.closest(".link-item-actions")) {
           window.open(link.url, "_blank");
         }
       });
 
-      // Eventos de Drag and Drop
       wrapper.addEventListener("dragstart", e => {
         e.dataTransfer.setData("text/plain", link.originalIndex);
         setTimeout(() => wrapper.classList.add("dragging"), 0);
@@ -868,7 +874,6 @@
       section.appendChild(title);
       section.appendChild(content);
 
-      // Clicar no título (exceto no menu) abre/fecha a categoria
       titleLeft.addEventListener("click", () => {
         section.classList.toggle("open");
       });
@@ -903,7 +908,7 @@
         msg.textContent = `Deseja excluir a categoria "${nomeCat}"? Ela está vazia.`;
         reassignContainer.style.display = "none";
       } else {
-        msg.textContent = `Deseja excluir todos os links abaixo pertencentes a "${nomeCat}"?`;
+        msg.textContent = `Deseja excluir a categoria "${nomeCat}" e o que deseja fazer com os links dela?`;
         reassignContainer.style.display = "block";
 
         reassignList.innerHTML = "";
@@ -928,13 +933,21 @@
       btnYes.parentNode.replaceChild(newBtnYes, btnYes);
       btnNo.parentNode.replaceChild(newBtnNo, btnNo);
 
+      // Botão "Excluir tudo" (Antigo "Sim"): Exclui a categoria E os links marcados
       newBtnYes.addEventListener("click", () => {
-        links = links.filter(l => l.category !== nomeCat);
+        if (itens.length > 0) {
+          const checkboxes = reassignList.querySelectorAll("input[type='checkbox']:checked");
+          const indicesParaExcluir = Array.from(checkboxes).map(chk => parseInt(chk.value));
+          indicesParaExcluir.sort((a, b) => b - a).forEach(idx => {
+            links.splice(idx, 1);
+          });
+        }
         categories = categories.filter(c => c !== nomeCat);
         deleteCategoryModal.style.display = "none";
         renderizarApp();
       });
 
+      // Botão "Mover" (Antigo "Não"): Exclui APENAS a categoria e MOVE os links marcados para o destino escolhido
       newBtnNo.addEventListener("click", () => {
         if (itens.length > 0) {
           const checkboxes = reassignList.querySelectorAll("input[type='checkbox']:checked");
@@ -963,7 +976,6 @@
         return;
       }
 
-      // Tratamento e validação de URL
       if (!/^https?:\/\//i.test(url)) {
         url = "https://" + url;
       }
