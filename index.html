@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Links Úteis</title>
+  <title>Central de Links</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="app-version" content="1.3.0">
+  <meta name="app-version" content="1.4.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Links Úteis">
+  <meta name="apple-mobile-web-app-title" content="Central de Links">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
   <link rel="manifest" href="manifest.json">
   <style>
@@ -146,9 +146,58 @@
     .category-title:hover {
       background: #e2e8f0;
     }
-    .category-actions {
+    .category-title-left {
       display: flex;
+      align-items: center;
       gap: 8px;
+      flex-grow: 1;
+    }
+    .category-actions-container {
+      position: relative;
+    }
+    .cat-menu-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #555;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .cat-menu-btn:hover {
+      background: rgba(0,0,0,0.1);
+      color: #000;
+    }
+    .cat-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 30px;
+      background: white;
+      color: #333;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      width: 130px;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .cat-dropdown button {
+      width: 100%;
+      padding: 10px;
+      text-align: left;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #333;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .cat-dropdown button:last-child {
+      border-bottom: none;
+    }
+    .cat-dropdown button:hover {
+      background: #f5f5f5;
+      color: #0078d7;
     }
     .category-content {
       display: none;
@@ -168,10 +217,7 @@
       background: #0078d7;
       border-radius: 8px;
       transition: transform 0.2s, opacity 0.2s;
-      cursor: grab;
-    }
-    .link-item-wrapper:active {
-      cursor: grabbing;
+      cursor: pointer;
     }
     .link-item-wrapper.dragging {
       opacity: 0.4;
@@ -192,29 +238,53 @@
       position: absolute;
       top: 4px;
       right: 4px;
-      display: flex;
-      gap: 4px;
-      opacity: 0;
-      transition: opacity 0.2s;
     }
-    .link-item-wrapper:hover .link-item-actions {
-      opacity: 1;
-    }
-    .link-action-btn {
-      background: rgba(0,0,0,0.4);
+    .link-menu-btn {
+      background: rgba(0,0,0,0.3);
       border: none;
       color: white;
       border-radius: 4px;
       width: 24px;
       height: 24px;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .link-action-btn:hover {
-      background: rgba(0,0,0,0.8);
+    .link-menu-btn:hover {
+      background: rgba(0,0,0,0.7);
+    }
+    .link-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 28px;
+      background: white;
+      color: #333;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      width: 110px;
+      z-index: 100;
+      overflow: hidden;
+    }
+    .link-dropdown button {
+      width: 100%;
+      padding: 8px 10px;
+      text-align: left;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #333;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .link-dropdown button:last-child {
+      border-bottom: none;
+    }
+    .link-dropdown button:hover {
+      background: #f5f5f5;
+      color: #0078d7;
     }
     .import-list {
       max-height: 150px;
@@ -298,16 +368,16 @@
         background: #555;
         color: #ffdd57;
       }
-      .dropdown-menu {
+      .dropdown-menu, .cat-dropdown, .link-dropdown {
         background: #1f1f1f;
         color: #e0e0e0;
         box-shadow: 0 4px 12px rgba(0,0,0,0.5);
       }
-      .dropdown-menu button {
+      .dropdown-menu button, .cat-dropdown button, .link-dropdown button {
         color: #e0e0e0;
         border-bottom: 1px solid #333;
       }
-      .dropdown-menu button:hover {
+      .dropdown-menu button:hover, .cat-dropdown button:hover, .link-dropdown button:hover {
         background: #2a2a2a;
         color: #ffdd57;
       }
@@ -321,6 +391,13 @@
       }
       .category-title:hover {
         background: #333;
+      }
+      .cat-menu-btn {
+        color: #aaa;
+      }
+      .cat-menu-btn:hover {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
       }
       .link-item-wrapper {
         background: #333;
@@ -355,7 +432,7 @@
 </head>
 <body>
   <header>
-    <h2>Meus Links Úteis</h2>
+    <h2>Central de Links</h2>
     <div class="menu-container">
       <button class="menu-btn" id="menuToggle" title="Menu">⋮</button>
       <div class="dropdown-menu" id="dropdownMenu">
@@ -384,10 +461,10 @@
       <h3 id="linkModalTitle">Adicionar Novo Link</h3>
       <form id="linkForm">
         <input type="text" id="linkName" placeholder="Nome do link" required>
-        <input type="url" id="linkUrl" placeholder="URL do link" required>
-        <div id="categorySelectWrapper" style="display: none;">
+        <input type="text" id="linkUrl" placeholder="URL do link (ex: site.com ou https://site.com)" required>
+        <div id="categorySelectWrapper">
           <select id="linkCategory">
-            <option value="">Sem Categoria</option>
+            <option value="">Selecione uma categoria...</option>
           </select>
         </div>
         <button type="submit">Adicionar Link</button>
@@ -409,7 +486,7 @@
     </div>
 
     <div id="appContainer"></div>
-    <div class="version-footer" id="versionDisplay">Versão: 1.3.0</div>
+    <div class="version-footer" id="versionDisplay">Versão: 1.4.0</div>
   </div>
 
   <input type="file" id="importFile" accept="*/*" style="display: none;">
@@ -458,6 +535,8 @@
 
     window.addEventListener("click", () => {
       dropdownMenu.style.display = "none";
+      document.querySelectorAll(".cat-dropdown").forEach(d => d.style.display = "none");
+      document.querySelectorAll(".link-dropdown").forEach(d => d.style.display = "none");
     });
 
     function fecharModais() {
@@ -524,16 +603,18 @@
     function atualizarSelectCategorias() {
       if (categories.length === 0) {
         categorySelectWrapper.style.display = "none";
-        linkCategorySelect.value = "";
+        linkCategorySelect.innerHTML = '<option value="">Sem Categoria</option>';
+        linkCategorySelect.required = false;
       } else {
         categorySelectWrapper.style.display = "block";
-        linkCategorySelect.innerHTML = '<option value="">Sem Categoria</option>';
+        linkCategorySelect.innerHTML = '<option value="">Selecione uma categoria...</option>';
         categories.forEach(cat => {
           const option = document.createElement("option");
           option.value = cat;
           option.textContent = cat;
           linkCategorySelect.appendChild(option);
         });
+        linkCategorySelect.required = true;
       }
     }
 
@@ -563,8 +644,9 @@
           appContainer.appendChild(grid);
         }
       } else {
-        categories.forEach((cat, index) => {
-          criarSecaoPasta(cat, agrupamento[cat], index === 0);
+        // Nenhuma categoria aberta por padrão
+        categories.forEach((cat) => {
+          criarSecaoPasta(cat, agrupamento[cat], false);
         });
 
         if (agrupamento[""].length > 0) {
@@ -585,17 +667,14 @@
       item.className = "link-item";
       item.textContent = link.name;
 
-      // Clique para abrir o link somente se não for um arrasto
-      let clicked = true;
-      wrapper.addEventListener("pointerdown", () => { clicked = true; });
-      wrapper.addEventListener("pointermove", () => { clicked = false; });
+      // Clique simples abre o link diretamente
       wrapper.addEventListener("click", (e) => {
-        if (clicked && !e.target.closest(".link-item-actions")) {
+        if (!e.target.closest(".link-item-actions")) {
           window.open(link.url, "_blank");
         }
       });
 
-      // Eventos nativos de Drag and Drop para reordenação e exclusão
+      // Eventos de Drag and Drop
       wrapper.addEventListener("dragstart", e => {
         e.dataTransfer.setData("text/plain", link.originalIndex);
         setTimeout(() => wrapper.classList.add("dragging"), 0);
@@ -632,29 +711,46 @@
       const actionsDiv = document.createElement("div");
       actionsDiv.className = "link-item-actions";
 
+      const menuBtn = document.createElement("button");
+      menuBtn.className = "link-menu-btn";
+      menuBtn.textContent = "⋮";
+      menuBtn.title = "Opções do Link";
+
+      const dropdown = document.createElement("div");
+      dropdown.className = "link-dropdown";
+
       const editBtn = document.createElement("button");
-      editBtn.className = "link-action-btn";
-      editBtn.textContent = "✏️";
-      editBtn.title = "Editar Link";
+      editBtn.textContent = "✏️ Editar";
       editBtn.onclick = (e) => {
         e.stopPropagation();
+        dropdown.style.display = "none";
         abrirEdicaoLink(link.originalIndex);
       };
 
       const deleteBtn = document.createElement("button");
-      deleteBtn.className = "link-action-btn";
-      deleteBtn.textContent = "🗑️";
-      deleteBtn.title = "Excluir Link";
+      deleteBtn.textContent = "🗑️ Excluir";
       deleteBtn.onclick = (e) => {
         e.stopPropagation();
+        dropdown.style.display = "none";
         if (confirm(`Deseja excluir o link "${link.name}"?`)) {
           links.splice(link.originalIndex, 1);
           renderizarApp();
         }
       };
 
-      actionsDiv.appendChild(editBtn);
-      actionsDiv.appendChild(deleteBtn);
+      dropdown.appendChild(editBtn);
+      dropdown.appendChild(deleteBtn);
+
+      menuBtn.onclick = (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".link-dropdown").forEach(d => {
+          if (d !== dropdown) d.style.display = "none";
+        });
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+      };
+
+      actionsDiv.appendChild(menuBtn);
+      actionsDiv.appendChild(dropdown);
 
       wrapper.appendChild(item);
       wrapper.appendChild(actionsDiv);
@@ -677,12 +773,9 @@
 
     function reordenarLinks(origemIdx, destinoIdx) {
       const itemMovido = links.splice(origemIdx, 1)[0];
-      
-      // Ajusta o índice de destino caso o item removido estivesse antes
       if (origemIdx < destinoIdx) {
         destinoIdx--;
       }
-      
       links.splice(destinoIdx, 0, itemMovido);
       renderizarApp();
     }
@@ -709,33 +802,54 @@
       const title = document.createElement("div");
       title.className = "category-title";
       
-      const spanName = document.createElement("span");
-      spanName.textContent = `📁 ${nomeCat} (${itens.length})`;
-      title.appendChild(spanName);
+      const titleLeft = document.createElement("div");
+      titleLeft.className = "category-title-left";
+      titleLeft.textContent = `📁 ${nomeCat} (${itens.length})`;
+      title.appendChild(titleLeft);
       
-      const actionsDiv = document.createElement("div");
-      actionsDiv.className = "category-actions";
+      const actionsContainer = document.createElement("div");
+      actionsContainer.className = "category-actions-container";
 
       if (!isGeral) {
+        const catMenuBtn = document.createElement("button");
+        catMenuBtn.className = "cat-menu-btn";
+        catMenuBtn.textContent = "⋮";
+        catMenuBtn.title = "Opções da Categoria";
+
+        const catDropdown = document.createElement("div");
+        catDropdown.className = "cat-dropdown";
+
         const editCatBtn = document.createElement("button");
         editCatBtn.textContent = "✏️ Editar";
-        editCatBtn.style.cssText = "background:none; border:none; color:#0078d7; cursor:pointer; font-size:0.8rem;";
         editCatBtn.onclick = (e) => {
           e.stopPropagation();
+          catDropdown.style.display = "none";
           abrirEdicaoCategoria(nomeCat);
         };
-        actionsDiv.appendChild(editCatBtn);
 
         const deleteCatBtn = document.createElement("button");
         deleteCatBtn.textContent = "❌ Excluir";
-        deleteCatBtn.style.cssText = "background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.8rem;";
         deleteCatBtn.onclick = (e) => {
           e.stopPropagation();
+          catDropdown.style.display = "none";
           iniciarExclusaoCategoria(nomeCat, itens);
         };
-        actionsDiv.appendChild(deleteCatBtn);
+
+        catDropdown.appendChild(editCatBtn);
+        catDropdown.appendChild(deleteCatBtn);
+
+        catMenuBtn.onclick = (e) => {
+          e.stopPropagation();
+          document.querySelectorAll(".cat-dropdown").forEach(d => {
+            if (d !== catDropdown) d.style.display = "none";
+          });
+          catDropdown.style.display = catDropdown.style.display === "block" ? "none" : "block";
+        };
+
+        actionsContainer.appendChild(catMenuBtn);
+        actionsContainer.appendChild(catDropdown);
       }
-      title.appendChild(actionsDiv);
+      title.appendChild(actionsContainer);
 
       const content = document.createElement("div");
       content.className = "category-content";
@@ -754,12 +868,9 @@
       section.appendChild(title);
       section.appendChild(content);
 
-      title.addEventListener("click", () => {
-        const jaAberta = section.classList.contains("open");
-        document.querySelectorAll(".category-section").forEach(s => s.classList.remove("open"));
-        if (!jaAberta) {
-          section.classList.add("open");
-        }
+      // Clicar no título (exceto no menu) abre/fecha a categoria
+      titleLeft.addEventListener("click", () => {
+        section.classList.toggle("open");
       });
 
       appContainer.appendChild(section);
@@ -803,7 +914,7 @@
           reassignList.appendChild(div);
         });
 
-        targetSelect.innerHTML = '<option value="">-- Mover para Sem Categoria (Página Principal) --</option>';
+        targetSelect.innerHTML = '<option value="">-- Mover para Sem Categoria (Geral) --</option>';
         categories.filter(c => c !== nomeCat).forEach(c => {
           const opt = document.createElement("option");
           opt.value = c;
@@ -844,8 +955,25 @@
     linkForm.addEventListener("submit", e => {
       e.preventDefault();
       const nome = linkNameInput.value.trim();
-      const url = linkUrlInput.value.trim();
+      let url = linkUrlInput.value.trim();
       const cat = categories.length > 0 ? linkCategorySelect.value : "";
+
+      if (categories.length > 0 && !cat) {
+        alert("Por favor, selecione uma categoria.");
+        return;
+      }
+
+      // Tratamento e validação de URL
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
+
+      try {
+        new URL(url);
+      } catch (_) {
+        alert("Por favor, insira uma URL válida.");
+        return;
+      }
 
       if (editingLinkIndex !== null) {
         links[editingLinkIndex] = { name: nome, url: url, category: cat };
